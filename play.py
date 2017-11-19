@@ -96,17 +96,107 @@ class Target():
         pygame.draw.rect(window, self.color, self.rect)
 
 class Player():
-    def __init__(self, starting_points=0, lives=3):
-        self.points = starting_points
+    def __init__(self, starting_score=0, lives=3):
+        self.score = starting_score
         self.lives = lives
+        self.age = 0
 
     def subtract_life(self):
         self.lives = self.lives - 1
         if self.lives == 0:
             GameOver()
 
-    def add_points(self, new_points=20):
-        self.points = self.points + new_points
+    def add_score(self, new_score=20):
+        self.score = self.score + new_score
+
+    def set_age(self, start, finish):
+        self.age = finish - start
+
+    def get_age(self):
+        return self.age
+
+class Scoreboard():
+    def __init__(self, x, y, size_x, size_y, font, player, font_color=(255,255,255), primary_color=(0,0,255), secondary_color=(191,191,0)):
+
+        self.font = font
+        self.font_color = font_color
+        self.primary_color = primary_color
+        self.secondary_color = secondary_color
+
+        #Full Scoreboard View:
+
+        ##SCORE#############PREDCTION##############LIVES##
+        ##################################################
+        ###VAL################TIME##################VAL###
+        ##################################################
+
+        self.rect_background = pygame.Rect(x, y, size_x, size_y)
+
+
+        self.score_title_rect = pygame.Rect(x, y, (x + (size_x / 4)), size_y / 4)
+        self.prediction_left_rect =   pygame.Rect(x + (size_x / 4) + (0 * (size_x / 6)), y, size_x / 6, size_y / 4)
+        self.prediction_stop_rect =   pygame.Rect(x + (size_x / 4) + (1 * (size_x / 6)), y, size_x / 6, size_y / 4)
+        self.prediction_right_rect =  pygame.Rect(x + (size_x / 4) + (2 * (size_x / 6)), y, size_x / 6, size_y / 4)
+        self.lives_title_rect = pygame.Rect(x + (size_x * 3/4), y, size_x / 4, size_y / 4 )
+
+
+        self.score_value_rect = pygame.Rect(x, y + (size_y / 4), ((x + size_x)/4), ((size_y / 4) * 3) )
+        self.age_value_rect = pygame.Rect( (x + (size_x / 4)), y + (size_y / 4), size_x / 2, size_y * 3/4)
+        self.lives_value_rect = pygame.Rect(x + (size_x * 3/4), y + (size_y / 4), size_x / 4, size_y * 3/4)
+
+        self.score_value_text_size = self.font.size(str(player.score))
+        self.age_value_text_size = self.font.size(str(player.age))
+        self.lives_value_text_size = self.font.size(str(player.lives))
+
+        self.score_title_text_size = self.font.size("Score:")
+        self.score_title_pos = (self.score_title_rect[0] + (self.score_title_rect[2] / 2) - (self.score_title_text_size[0] / 2), (self.score_title_rect[1] + (self.score_title_rect[3] / 2) - (self.score_title_text_size[1] / 2)))
+        self.score_title_text = self.font.render("Score:", True, self.font_color)
+
+        self.lives_title_text_size = font.size("Lives:")
+        self.lives_title_pos = (self.lives_title_rect[0] + (self.lives_title_rect[2] / 2) - (self.lives_title_text_size[0] / 2), (self.lives_title_rect[1] + (self.lives_title_rect[3] / 2) - (self.lives_title_text_size[1] / 2)))
+        self.lives_title_text = self.font.render("Lives:", True, self.font_color)
+
+        self.age_value_pos = (self.age_value_rect[0] + (self.age_value_rect[2] / 2) - (self.age_value_text_size[0] / 2), (self.age_value_rect[1] + (self.age_value_rect[3] / 2) - (self.age_value_text_size[1] / 2)))
+
+        self.UpdateScoreBoardValues(player)
+
+        self.rect_prediction = pygame.Rect(x, y, size_x, size_y)
+
+
+    def UpdateScoreBoardValues(self, player):
+
+        self.score_value_text_size = self.font.size(str(player.score))
+        self.score_value_text = self.font.render(str(player.score), True, self.font_color)
+        self.score_value_pos = self.score_value_rect[0] + (self.score_value_rect[2] / 2) - (self.score_value_text_size[0] / 2), self.score_value_rect[1] + (self.score_value_rect[3] / 2) - (self.score_value_text_size[1] / 2)
+
+        self.lives_value_text_size = self.font.size(str(player.lives))
+        self.lives_value_text = self.font.render(str(player.lives), True, self.font_color)
+        self.lives_value_pos = (self.lives_value_rect[0] + (self.lives_value_rect[2] / 2) - (self.lives_value_text_size[0] / 2), self.lives_value_rect[1] + (self.lives_value_rect[3] / 2) - (self.lives_value_text_size[1] / 2))
+
+        age_val = str(int(player.age)) + 's'
+        self.age_value_text_size = self.font.size(age_val)
+        self.age_value_text = self.font.render(age_val, True, self.font_color)
+        self.age_value_pos = (self.age_value_rect[0] + (self.age_value_rect[2] / 2) - (self.age_value_text_size[0] / 2), (self.age_value_rect[1] + (self.age_value_rect[3] / 2) - (self.age_value_text_size[1] / 2)))
+
+
+
+
+
+    def Draw(self, window, player, font):
+
+        pygame.draw.rect(window, self.secondary_color, self.rect_background)
+        pygame.draw.rect(window, self.primary_color, self.score_title_rect)
+        pygame.draw.rect(window, self.primary_color, self.lives_title_rect)
+        pygame.draw.rect(window, self.secondary_color, self.score_value_rect)
+        pygame.draw.rect(window, self.secondary_color, self.lives_value_rect)
+
+        window.blit(self.score_title_text, (self.score_title_pos))
+        window.blit(self.score_value_text, (self.score_value_pos))
+
+        window.blit(self.lives_title_text, (self.lives_title_pos))
+        window.blit(self.lives_value_text, (self.lives_value_pos))
+
+        window.blit(self.age_value_text, (self.age_value_pos))
 
 
 def GameOver():
@@ -128,8 +218,8 @@ def main():
     pygame.init()
 
     fps = 60
-    window_width = int(sys.argv[1])
-    window_height = int(sys.argv[2])
+    window_width = 640
+    window_height = 640
 
     BLACK, WHITE = ( 0, 0, 0), ( 255, 255, 255)
     GREY_DARK, GREY_LIGHT = ( 63, 63, 63), ( 191, 191, 191)
@@ -146,15 +236,15 @@ def main():
 
     window_scaling = True
 
-    paddle_width = 60
+    paddle_width = 400
     paddle_height = 8
-    paddle_start_pos = (window_width / 2) - (paddle_width / 2), (window_height * 95 / 100) - (paddle_height / 2)
+    paddle_start_pos = (window_width / 2) - (paddle_width / 2), (window_height * 70 / 100) - (paddle_height / 2)
     paddle_color = BLUE
     paddle_momentum = window_width / fps # Momentum will move the paddle quickly enough to cross the screen left to right in 1 second
 
     ball_width = 15
     ball_height = 15
-    ball_start_pos = (window_height * 5 / 10) - (ball_height / 2), (window_width / 2) - (ball_width / 2)
+    ball_start_pos = (window_height * 5 / 10) - (ball_height / 2), (window_width * 30 / 100) - (ball_width / 2)
     ball_color = RED
 
     target_width = 30
@@ -167,9 +257,15 @@ def main():
     targets_start_x = (window_width - targets_total_width) / 2
     targets_start_y = (window_height) / 50
 
+    width = window_width
+    height = window_height - (paddle_start_pos[1] + 20)
+    start_pos = 0, paddle_start_pos[1] + 20
+    font = pygame.font.SysFont('Arial', 30)
+
+    player = Player(lives=100)
+    scoreboard = Scoreboard(start_pos[0], start_pos[1], width, height, font, player, font_color=WHITE, primary_color=BLUE, secondary_color=BLACK)
     paddle = Paddle(paddle_start_pos[0],paddle_start_pos[1], paddle_width, paddle_height, paddle_color, momentum=paddle_momentum)
     ball = Ball(ball_start_pos[0], ball_start_pos[1], ball_width, ball_height, ball_color)
-    player = Player(lives=100)
     target_list = []
 
     for row in range(target_rows):
@@ -184,9 +280,10 @@ def main():
     ball_direction = 1,1
     paddle_collision_limiter = time.time() - 1
     target_collision_limiter = time.time() - 1
-    quit = False
     frames = 0
+    quit = False
     t = time.time()
+    game_start_time = t
     while not quit:
         #Gather User Input
         for event in pygame.event.get():
@@ -257,14 +354,13 @@ def main():
         if ball.rect.colliderect(root_window_right_rect):
             ball_direction = 0, ball_direction[1]
 
-
         c=0
         for target in target_list:
             if not target.is_alive:
                 pass
             elif ball.rect.colliderect(target.rect):
                 target_list[c].Kill()
-                player.add_points()
+                player.add_score()
                 print('Killed Target # {}'.format(c))
                 if time.time() - target_collision_limiter > 1:
                     target_collision_limiter = time.time()
@@ -272,11 +368,14 @@ def main():
                         ball_direction = ball_direction[0], 0
                     else:
                         ball_direction = ball_direction[0], 1
-
             c+=1
 
 
+        #Update Scoreboard
+        scoreboard.UpdateScoreBoardValues(player)
+
         #Draw Objects
+        scoreboard.Draw(root_window, player, font)
         paddle.Draw(root_window)
         ball.Draw(root_window)
         for target in target_list:
@@ -290,6 +389,7 @@ def main():
         pygame.display.update()
         root_window.fill(GREY_LIGHT)
         new_t = time.time()
+        player.set_age(game_start_time, new_t)
         #print('Frame Took: {}s'.format(t - new_t))
         t = new_t
 
