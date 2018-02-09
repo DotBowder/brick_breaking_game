@@ -8,3 +8,5 @@ python3 play.py [resolution x] [resolution y]
 
 
 eg: python3 play.py 640 480
+
+![Visual](https://raw.githubusercontent.com/DotBowder/brick_breaking_game/master/ExampleImages/BrickExmaple.png)
